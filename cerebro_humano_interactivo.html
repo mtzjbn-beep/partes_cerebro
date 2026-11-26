@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cerebro Humano - Video Interactivo</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Orbitron para detalles tecnológicos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #031538;
+      --bg-mid: #08347a;
+      --bg-bright: #0d52bd;
+      --cyan-glow: #38bdf8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 50% 45%, #1261d1 0%, #093b8c 45%, #041b47 85%, #020f2b 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+      margin: 0;
+    }
+
+    .font-display {
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    /* Líneas de circuitos electrónicos animadas en el fondo */
+    .circuit-line {
+      stroke-dasharray: 180;
+      stroke-dashoffset: 180;
+      animation: pulseCircuit 5s linear infinite;
+    }
+
+    .circuit-line-delayed {
+      stroke-dasharray: 220;
+      stroke-dashoffset: 220;
+      animation: pulseCircuit 6.5s linear infinite 2s;
+    }
+
+    @keyframes pulseCircuit {
+      0% {
+        stroke-dashoffset: 360;
+        opacity: 0.25;
+      }
+      50% {
+        opacity: 0.9;
+      }
+      100% {
+        stroke-dashoffset: 0;
+        opacity: 0.25;
+      }
+    }
+
+    .node-glow {
+      animation: nodePulse 2.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes nodePulse {
+      0% { r: 3; opacity: 0.5; }
+      100% { r: 5.5; opacity: 1; }
+    }
+
+    /* Título superior estilo cápsula neón */
+    .header-capsule {
+      background: linear-gradient(180deg, #062a6e 0%, #021640 100%);
+      border: 2.5px solid #e0f2fe;
+      box-shadow:
+        0 0 18px rgba(56, 189, 248, 0.75),
+        inset 0 0 14px rgba(14, 165, 233, 0.5);
+    }
+
+    .neon-bar {
+      height: 4px;
+      background: #e0f2fe;
+      border-radius: 9999px;
+      box-shadow: 0 0 12px #38bdf8, 0 0 24px #0284c7;
+    }
+
+    /* Estilo botones cápsula laterales (inspirado en 124015.jpg) */
+    .brain-btn {
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      border: 2px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.35);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brain-btn::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .brain-btn:hover::after {
+      left: 130%;
+    }
+
+    .brain-btn:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45), 0 0 16px rgba(255, 255, 255, 0.55);
+    }
+
+    .brain-btn.active {
+      transform: scale(1.07);
+      border-color: #ffffff;
+      box-shadow:
+        0 0 0 3px rgba(56, 189, 248, 0.65),
+        0 0 25px rgba(255, 255, 255, 0.85),
+        0 10px 24px rgba(0, 0, 0, 0.5);
+      z-index: 10;
+    }
+
+    /* Animaciones suaves para el cerebro SVG y zoom */
+    #brain-camera-group {
+      transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+      transform-origin: center center;
+    }
+
+    .brain-hotspot {
+      cursor: pointer;
+      transition: opacity 0.35s ease, filter 0.35s ease;
+    }
+
+    .brain-hotspot:hover {
+      filter: brightness(1.2);
+    }
+
+    .pulse-ring {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: radarPing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes radarPing {
+      0% {
+        transform: scale(0.75);
+        opacity: 0.95;
+      }
+      80% {
+        transform: scale(2.1);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(2.1);
+        opacity: 0;
+      }
+    }
+
+    /* Tarjeta flotante de detalle */
+    .detail-card {
+      background: linear-gradient(145deg, rgba(6, 32, 82, 0.94) 0%, rgba(3, 18, 52, 0.97) 100%);
+      backdrop-filter: blur(14px);
+      border: 1.5px solid rgba(125, 211, 252, 0.55);
+      box-shadow:
+        0 20px 45px rgba(0, 0, 0, 0.65),
+        0 0 25px rgba(14, 165, 233, 0.35),
+        inset 0 1px 1px rgba(255, 255, 255, 0.25);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .detail-card.hidden-card {
+      opacity: 0;
+      transform: translateY(16px) scale(0.95);
+      pointer-events: none;
+    }
+
+    .detail-card.visible-card {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    /* Onda de audio animada cuando habla */
+    .sound-bar {
+      width: 3px;
+      height: 10px;
+      background-color: #38bdf8;
+      border-radius: 9999px;
+      animation: soundWave 0.6s ease-in-out infinite alternate;
+    }
+    .sound-bar:nth-child(2) { animation-delay: 0.2s; height: 16px; }
+    .sound-bar:nth-child(3) { animation-delay: 0.4s; height: 8px; }
+    .sound-bar:nth-child(4) { animation-delay: 0.1s; height: 14px; }
+
+    @keyframes soundWave {
+      0% { transform: scaleY(0.35); }
+      100% { transform: scaleY(1.15); }
+    }
+
+    /* Scrollbar sutil */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(2, 15, 43, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(56, 189, 248, 0.4);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="flex flex-col justify-between min-h-screen select-none relative">
+
+  <!-- FONDO DE CIRCUITOS ELECTRÓNICOS DECORATIVOS (SVG) -->
+  <svg class="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-65" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <filter id="glowCyan" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="3.5" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+    </defs>
+
+    <!-- Esquina Superior Izquierda -->
+    <g stroke="#38bdf8" stroke-width="2" fill="none" filter="url(#glowCyan)">
+      <path d="M 0 90 L 70 90 L 110 130 L 110 240" class="circuit-line" />
+      <path d="M 35 0 L 35 160 L 80 205 L 80 320" class="circuit-line-delayed" />
+      <path d="M 110 0 L 110 75 L 155 120 L 155 190" class="circuit-line" />
+      <path d="M 165 0 L 165 55 L 200 90" class="circuit-line-delayed" />
+      <circle cx="110" cy="240" r="4" fill="#7dd3fc" class="node-glow" />
+      <circle cx="80" cy="320" r="4" fill="#7dd3fc" class="node-glow" />
+      <circle cx="155" cy="190" r="4" fill="#7dd3fc" class="node-glow" />
+      <circle cx="200" cy="90" r="4" fill="#7dd3fc" class="node-glow" />
+    </g>
+
+    <!-- Esquina Inferior Izquierda -->
+    <g stroke="#38bdf8" stroke-width="2" fill="none" filter="url(#glowCyan)">
+      <path d="M 0 760 L 90 760 L 140 710 L 230 710" class="circuit-line-delayed" />
+      <path d="M 45 900 L 45 810 L 105 750 L 195 750" class="circuit-line" />
+      <path d="M 120 900 L 120 845 L 175 790 L 310 790" class="circuit-line-delayed" />
+      <circle cx="230" cy="710" r="4.5" fill="#e0f2fe" class="node-glow" />
+      <circle cx="195" cy="750" r="4" fill="#7dd3fc" class="node-glow" />
+      <circle cx="310" cy="790" r="5" fill="#e0f2fe" class="node-glow" />
+    </g>
+
+    <!-- Esquina Superior Derecha -->
+    <g stroke="#38bdf8" stroke-width="2" fill="none" filter="url(#glowCyan)">
+      <path d="M 1440 105 L 1365 105 L 1320 150 L 1320 265" class="circuit-line-delayed" />
+      <path d="M 1400 0 L 1400 175 L 1355 220 L 1355 340" class="circuit-line" />
+      <path d="M 1325 0 L 1325 80 L 1280 125 L 1280 205" class="circuit-line-delayed" />
+      <circle cx="1320" cy="265" r="4" fill="#7dd3fc" class="node-glow" />
+      <circle cx="1355" cy="340" r="4" fill="#7dd3fc" class="node-glow" />
+      <circle cx="1280" cy="205" r="4" fill="#7dd3fc" class="node-glow" />
+    </g>
+
+    <!-- Esquina Inferior Derecha -->
+    <g stroke="#38bdf8" stroke-width="2" fill="none" filter="url(#glowCyan)">
+      <path d="M 1440 770 L 1345 770 L 1295 720 L 1205 720" class="circuit-line" />
+      <path d="M 1390 900 L 1390 815 L 1330 755 L 1235 755" class="circuit-line-delayed" />
+      <path d="M 1310 900 L 1310 845 L 1255 790 L 1110 790" class="circuit-line" />
+      <circle cx="1205" cy="720" r="4.5" fill="#e0f2fe" class="node-glow" />
+      <circle cx="1235" cy="755" r="4" fill="#7dd3fc" class="node-glow" />
+      <circle cx="1110" cy="790" r="5" fill="#e0f2fe" class="node-glow" />
+    </g>
+  </svg>
+
+  <!-- ENCABEZADO PRINCIPAL -->
+  <header class="relative z-20 pt-3 sm:pt-5 pb-2 px-4 flex flex-col items-center">
+    <div class="w-full max-w-4xl flex items-center justify-center gap-3 sm:gap-5">
+      <div class="neon-bar hidden sm:block flex-1 max-w-[140px]"></div>
+      <div class="header-capsule px-7 sm:px-14 py-2 sm:py-2.5 rounded-full text-center">
+        <h1 class="font-display font-extrabold text-2xl sm:text-4xl md:text-[2.6rem] tracking-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
+          Cerebro Humano
+        </h1>
+      </div>
+      <div class="neon-bar hidden sm:block flex-1 max-w-[140px]"></div>
+    </div>
+    <p class="text-sky-200/90 text-xs sm:text-sm mt-2 text-center font-medium tracking-wide">
+      Haz clic en cualquier estructura o inicia el recorrido interactivo con audio
+    </p>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL DE 3 COLUMNAS -->
+  <main class="relative z-10 flex-1 w-full max-w-[1380px] mx-auto px-3 sm:px-6 py-2 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-3 items-center">
+
+    <!-- COLUMNA IZQUIERDA (5 Botones) -->
+    <section aria-label="Estructuras izquierdas" class="lg:col-span-3 flex flex-row flex-wrap lg:flex-col justify-center gap-2.5 sm:gap-3.5 order-2 lg:order-1">
+      <div id="left-buttons-container" class="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-2.5 sm:gap-3.5">
+        <!-- Generado dinámicamente por JS -->
+      </div>
+    </section>
+
+    <!-- COLUMNA CENTRAL: ILUSTRACIÓN INTERACTIVA DEL CEREBRO + TARJETA AMPLIADA -->
+    <section aria-label="Diagrama interactivo del cerebro humano" class="lg:col-span-6 relative flex flex-col items-center justify-center order-1 lg:order-2 min-h-[340px] sm:min-h-[440px] lg:min-h-[510px]">
+      
+      <!-- Contenedor SVG del Cerebro con capacidad de Zoom -->
+      <div class="relative w-full max-w-[520px] aspect-[1.08/1] flex items-center justify-center">
+        
+        <!-- Resplandor ambiental detrás del cerebro -->
+        <div class="absolute inset-8 rounded-full bg-sky-400/25 blur-3xl pointer-events-none"></div>
+
+        <svg id="brain-svg" viewBox="0 0 600 560" class="w-full h-full drop-shadow-[0_18px_35px_rgba(0,0,0,0.55)] overflow-visible" role="img" aria-label="Ilustración anatómica interactiva del cerebro humano">
+          <defs>
+            <!-- Gradientes realistas para el cerebro -->
+            <radialGradient id="skullGlow" cx="50%" cy="48%" r="50%">
+              <stop offset="65%" stop-color="#e0f2fe" stop-opacity="0.18" />
+              <stop offset="92%" stop-color="#bae6fd" stop-opacity="0.48" />
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0.72" />
+            </radialGradient>
+
+            <linearGradient id="cortexBase" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fbc29d" />
+              <stop offset="45%" stop-color="#f29b6e" />
+              <stop offset="100%" stop-color="#d46b42" />
+            </linearGradient>
+
+            <linearGradient id="cortexHighlight" x1="20%" y1="0%" x2="80%" y2="100%">
+              <stop offset="0%" stop-color="#ffd8be" />
+              <stop offset="100%" stop-color="#e58356" />
+            </linearGradient>
+
+            <linearGradient id="cerebellumLeftGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#7c3aed" />
+              <stop offset="50%" stop-color="#5b21b6" />
+              <stop offset="100%" stop-color="#3b0764" />
+            </linearGradient>
+
+            <linearGradient id="cerebellumRightGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#c026d3" />
+              <stop offset="50%" stop-color="#9333ea" />
+              <stop offset="100%" stop-color="#581c87" />
+            </linearGradient>
+
+            <linearGradient id="brainstemGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#c97b53" />
+              <stop offset="50%" stop-color="#f3b38b" />
+              <stop offset="100%" stop-color="#b5643d" />
+            </linearGradient>
+
+            <filter id="gyrusShadow" x="-10%" y="-10%" width="120%" height="120%">
+              <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#5c210b" flood-opacity="0.45" />
+            </filter>
+
+            <filter id="activeGlow" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="6" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- Grupo con transformación de Cámara (Zoom y Paneo dinámico) -->
+          <g id="brain-camera-group">
+
+            <!-- 1. SILUETA TRANSLÚCIDA DEL CRÁNEO (Como en 124015.jpg) -->
+            <g id="skull-outline" opacity="0.85">
+              <path d="M 300 22 
+                       C 165 22, 92 115, 96 245 
+                       C 98 310, 125 360, 145 415 
+                       L 172 475 L 222 490 L 238 532 L 362 532 L 378 490 L 428 475 L 455 415
+                       C 475 360, 502 310, 504 245
+                       C 508 115, 435 22, 300 22 Z"
+                    fill="url(#skullGlow)" stroke="rgba(224, 242, 254, 0.65)" stroke-width="2.5" />
+              <!-- Arcos cigomáticos / base ósea sutil -->
+              <path d="M 115 305 Q 145 365 195 395 L 225 465" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="3" />
+              <path d="M 485 305 Q 455 365 405 395 L 375 465" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="3" />
+            </g>
+
+            <!-- 2. TRONCO ENCEFÁLICO (Centro inferior) -->
+            <g id="brainstem">
+              <path d="M 274 335 C 272 390, 276 460, 281 522 L 319 522 C 324 460, 328 390, 326 335 Z"
+                    fill="url(#brainstemGrad)" stroke="#7c3318" stroke-width="1.5" />
+              <!-- Surco medio del tronco -->
+              <line x1="300" y1="350" x2="300" y2="518" stroke="#7c3318" stroke-width="1.8" opacity="0.65" />
+              <!-- Fibras horizontales protuberancia -->
+              <path d="M 276 375 Q 300 383 324 375" fill="none" stroke="#7c3318" stroke-width="1.4" opacity="0.55" />
+              <path d="M 277 392 Q 300 400 323 392" fill="none" stroke="#7c3318" stroke-width="1.4" opacity="0.55" />
+            </g>
+
+            <!-- 3. CEREBELO (Lóbulos morados en la base, izquierdo violeta y derecho magenta como 124015.jpg) -->
+            <g id="structure-cerebelo" class="brain-hotspot" onclick="selectPart('cerebelo')">
+              <!-- Lóbulo izquierdo cerebelo -->
+              <path d="M 294 338 C 245 330, 175 335, 165 375 C 156 410, 198 442, 245 445 C 252 462, 278 468, 294 452 Z"
+                    fill="url(#cerebellumLeftGrad)" stroke="#2e1065" stroke-width="2" />
+              <!-- Estrías horizontales características del cerebelo izquierdo -->
+              <g stroke="#a78bfa" stroke-width="1.5" fill="none" opacity="0.7">
+                <path d="M 172 365 Q 230 355 290 362" />
+                <path d="M 167 378 Q 230 370 290 376" />
+                <path d="M 171 392 Q 230 385 289 390" />
+                <path d="M 182 406 Q 235 400 288 404" />
+                <path d="M 200 420 Q 245 415 288 418" />
+                <path d="M 225 433 Q 258 430 288 432" />
+              </g>
+
+              <!-- Lóbulo derecho cerebelo -->
+              <path d="M 306 338 C 355 330, 425 335, 435 375 C 444 410, 402 442, 355 445 C 348 462, 322 468, 306 452 Z"
+                    fill="url(#cerebellumRightGrad)" stroke="#4a044e" stroke-width="2" />
+              <!-- Estrías horizontales características del cerebelo derecho -->
+              <g stroke="#f0abfc" stroke-width="1.5" fill="none" opacity="0.72">
+                <path d="M 428 365 Q 370 355 310 362" />
+                <path d="M 433 378 Q 370 370 310 376" />
+                <path d="M 429 392 Q 370 385 311 390" />
+                <path d="M 418 406 Q 365 400 312 404" />
+                <path d="M 400 420 Q 355 415 312 418" />
+                <path d="M 375 433 Q 342 430 312 432" />
+              </g>
+            </g>
+
+            <!-- 4. HEMISFERIOS CEREBRALES (Corteza Cerebral y Neocórtex) -->
+            <g id="cerebral-hemispheres" filter="url(#gyrusShadow)">
+              <!-- Hemisferio Izquierdo Base -->
+              <path id="left-hemisphere-shape"
+                    d="M 295 42
+                       C 255 36, 215 54, 192 84
+                       C 162 102, 138 140, 132 182
+                       C 116 218, 118 268, 134 306
+                       C 146 338, 182 354, 224 352
+                       C 258 350, 286 342, 295 325 Z"
+                    fill="url(#cortexBase)" stroke="#7c2d12" stroke-width="2.5" />
+
+              <!-- Hemisferio Derecho Base -->
+              <path id="right-hemisphere-shape"
+                    d="M 305 42
+                       C 345 36, 385 54, 408 84
+                       C 438 102, 462 140, 468 182
+                       C 484 218, 482 268, 466 306
+                       C 454 338, 418 354, 376 352
+                       C 342 350, 314 342, 305 325 Z"
+                    fill="url(#cortexBase)" stroke="#7c2d12" stroke-width="2.5" />
+
+              <!-- Circunvoluciones (Giros y Surcos detallados) Hemisferio Izquierdo -->
+              <g fill="none" stroke="#7c2d12" stroke-width="2.6" stroke-linecap="round" opacity="0.82">
+                <path d="M 292 78 C 262 72, 232 82, 215 104" />
+                <path d="M 292 115 C 250 108, 204 122, 178 152" />
+                <path d="M 292 155 C 242 148, 185 162, 152 196" />
+                <path d="M 292 198 C 238 192, 176 208, 136 242" />
+                <path d="M 292 242 C 242 238, 188 255, 148 288" />
+                <path d="M 292 285 C 248 282, 205 298, 175 326" />
+                <!-- Surcos secundarios verticales/oblicuos -->
+                <path d="M 235 64 C 228 92, 238 118, 224 142" />
+                <path d="M 192 112 C 184 145, 196 175, 178 205" />
+                <path d="M 162 178 C 154 212, 168 242, 152 272" />
+                <path d="M 248 164 C 240 198, 252 228, 236 260" />
+                <path d="M 218 248 C 210 278, 222 308, 206 336" />
+              </g>
+
+              <!-- Brillos de volumen en los giros izquierdos -->
+              <g fill="none" stroke="#ffedd5" stroke-width="2" stroke-linecap="round" opacity="0.55">
+                <path d="M 282 62 C 255 58, 230 68, 214 86" />
+                <path d="M 280 98 C 245 92, 205 106, 184 132" />
+                <path d="M 278 138 C 236 132, 186 146, 158 176" />
+                <path d="M 278 180 C 232 175, 178 190, 146 220" />
+                <path d="M 278 224 C 236 220, 188 235, 156 265" />
+              </g>
+
+              <!-- Circunvoluciones (Giros y Surcos detallados) Hemisferio Derecho -->
+              <g fill="none" stroke="#7c2d12" stroke-width="2.6" stroke-linecap="round" opacity="0.82">
+                <path d="M 308 78 C 338 72, 368 82, 385 104" />
+                <path d="M 308 115 C 350 108, 396 122, 422 152" />
+                <path d="M 308 155 C 358 148, 415 162, 448 196" />
+                <path d="M 308 198 C 362 192, 424 208, 464 242" />
+                <path d="M 308 242 C 358 238, 412 255, 452 288" />
+                <path d="M 308 285 C 352 282, 395 298, 425 326" />
+                <!-- Surcos secundarios -->
+                <path d="M 365 64 C 372 92, 362 118, 376 142" />
+                <path d="M 408 112 C 416 145, 404 175, 422 205" />
+                <path d="M 438 178 C 446 212, 432 242, 448 272" />
+                <path d="M 352 164 C 360 198, 348 228, 364 260" />
+                <path d="M 382 248 C 390 278, 378 308, 394 336" />
+              </g>
+
+              <!-- Brillos de volumen en los giros derechos -->
+              <g fill="none" stroke="#ffedd5" stroke-width="2" stroke-linecap="round" opacity="0.55">
+                <path d="M 318 62 C 345 58, 370 68, 386 86" />
+                <path d="M 320 98 C 355 92, 395 106, 416 132" />
+                <path d="M 322 138 C 364 132, 414 146, 442 176" />
+                <path d="M 322 180 C 368 175, 422 190, 454 220" />
+                <path d="M 322 224 C 364 220, 412 235, 444 265" />
+              </g>
+            </g>
+
+            <!-- 5. CAPA DE REGIONES ANATÓMICAS INTERACTIVAS (SUPERPOSICIÓN TRANSLÚCIDA / RAYOS X AL SELECCIONAR) -->
+            <g id="anatomical-overlays">
+              
+              <!-- Corteza Cerebral (Capa externa superior izquierda) -->
+              <g id="overlay-corteza_cerebral" class="brain-hotspot" onclick="selectPart('corteza_cerebral')">
+                <path d="M 295 42 C 255 36, 215 54, 192 84 C 162 102, 138 140, 132 182 L 175 185 C 185 130, 230 85, 295 78 Z"
+                      fill="#f59e0b" fill-opacity="0.22" stroke="#fbbf24" stroke-width="2" stroke-dasharray="5 3" />
+              </g>
+
+              <!-- Neocórtex (Región frontal/parietal extensa) -->
+              <g id="overlay-neocortex" class="brain-hotspot" onclick="selectPart('neocortex')">
+                <ellipse cx="215" cy="148" rx="56" ry="44" transform="rotate(-18 215 148)"
+                         fill="#10b981" fill-opacity="0.22" stroke="#34d399" stroke-width="2" stroke-dasharray="5 3" />
+              </g>
+
+              <!-- Sistema Límbico (Anillo interno alrededor del centro) -->
+              <g id="overlay-sistema_limbico" class="brain-hotspot" onclick="selectPart('sistema_limbico')">
+                <path d="M 235 230 C 235 165, 365 165, 365 230 C 365 285, 330 305, 300 305 C 270 305, 235 285, 235 230 Z"
+                      fill="#8b5cf6" fill-opacity="0.22" stroke="#a78bfa" stroke-width="2.2" stroke-dasharray="6 3" />
+              </g>
+
+              <!-- Corteza Ventromedial (Base frontal medial) -->
+              <g id="overlay-corteza_ventromedial" class="brain-hotspot" onclick="selectPart('corteza_ventromedial')">
+                <ellipse cx="268" cy="306" rx="34" ry="22"
+                         fill="#f97316" fill-opacity="0.28" stroke="#fb923c" stroke-width="2" />
+              </g>
+
+              <!-- Hipotálamo (Debajo del tálamo, centro-izquierda) -->
+              <g id="overlay-hipotalamo" class="brain-hotspot" onclick="selectPart('hipotalamo')">
+                <circle cx="276" cy="256" r="17"
+                        fill="#ef4444" fill-opacity="0.35" stroke="#f87171" stroke-width="2" />
+              </g>
+
+              <!-- Tálamo (Núcleo central profundo) -->
+              <g id="overlay-talamo" class="brain-hotspot" onclick="selectPart('talamo')">
+                <ellipse cx="322" cy="215" rx="26" ry="18"
+                         fill="#ef4444" fill-opacity="0.32" stroke="#fca5a5" stroke-width="2" />
+              </g>
+
+              <!-- Ínsula (Profundo en el surco lateral derecho) -->
+              <g id="overlay-insula" class="brain-hotspot" onclick="selectPart('insula')">
+                <ellipse cx="404" cy="222" rx="25" ry="34" transform="rotate(12 404 222)"
+                         fill="#64748b" fill-opacity="0.35" stroke="#cbd5e1" stroke-width="2" />
+              </g>
+
+              <!-- Amígdala (Núcleo en forma de almendra en el lóbulo temporal) -->
+              <g id="overlay-amigdala" class="brain-hotspot" onclick="selectPart('amigdala')">
+                <ellipse cx="354" cy="274" rx="16" ry="12" transform="rotate(-25 354 274)"
+                         fill="#14b8a6" fill-opacity="0.4" stroke="#5eead4" stroke-width="2.2" />
+              </g>
+
+              <!-- Hipocampo (Estructura curva junto a la amígdala) -->
+              <g id="overlay-hipocampo" class="brain-hotspot" onclick="selectPart('hipocampo')">
+                <path d="M 358 282 C 382 288, 398 272, 392 252 C 386 244, 376 250, 378 262 C 378 272, 368 276, 358 282 Z"
+                      fill="#10b981" fill-opacity="0.38" stroke="#6ee7b7" stroke-width="2.2" />
+              </g>
+
+              <!-- Giro Fusiforme (Base inferior del lóbulo temporal) -->
+              <g id="overlay-giro_fusiforme" class="brain-hotspot" onclick="selectPart('giro_fusiforme')">
+                <ellipse cx="395" cy="316" rx="34" ry="14" transform="rotate(-14 395 316)"
+                         fill="#ec4899" fill-opacity="0.35" stroke="#f472b6" stroke-width="2" />
+              </g>
+            </g>
+
+            <!-- 6. MARCADOR DINÁMICO DE ENFOQUE (Lupa / Pulso Luminoso sobre la parte activa) -->
+            <g id="focus-reticle" opacity="0" class="pointer-events-none transition-opacity duration-300">
+              <circle id="reticle-pulse" cx="300" cy="240" r="24" fill="none" stroke="#ffffff" stroke-width="3" class="pulse-ring" />
+              <circle id="reticle-ring" cx="300" cy="240" r="28" fill="rgba(255,255,255,0.14)" stroke="#38bdf8" stroke-width="3" filter="url(#activeGlow)" />
+              <circle id="reticle-dot" cx="300" cy="240" r="6" fill="#ffffff" />
+            </g>
+
+          </g>
+        </svg>
+
+        <!-- BOTÓN FLOTANTE DE RESTABLECER ZOOM (aparece cuando hay zoom) -->
+        <button id="reset-zoom-btn" onclick="resetView()"
+                class="hidden absolute top-2 right-2 z-30 bg-slate-900/85 hover:bg-sky-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-sky-400/60 shadow-lg flex items-center gap-1.5 transition cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+          </svg>
+          Vista completa
+        </button>
+      </div>
+
+      <!-- TARJETA FLOTANTE DE DETALLE CON IMAGEN AMPLIADA Y DESCRIPCIÓN (Inspirada en 124004.jpg + Zoom Anatómico) -->
+      <div id="info-card" class="detail-card hidden-card w-full max-w-[540px] rounded-2xl p-4 sm:p-5 mt-1 sm:-mt-6 z-30 relative">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-center gap-3.5">
+            <!-- Miniatura SVG Ampliada de la Estructura Seleccionada -->
+            <div id="card-zoom-preview" class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-sky-950/90 border border-sky-400/50 flex items-center justify-center shrink-0 overflow-hidden shadow-inner relative">
+              <!-- Se inyecta SVG ampliado específico de la parte -->
+            </div>
+
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span id="card-badge" class="text-[10px] uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-full bg-sky-500/30 border border-sky-300/50 text-sky-100">
+                  Estructura Cerebral
+                </span>
+                <!-- Indicador animado de voz -->
+                <div id="voice-wave" class="hidden items-center gap-0.5 px-2 py-0.5 rounded-full bg-sky-500/20">
+                  <span class="sound-bar"></span>
+                  <span class="sound-bar"></span>
+                  <span class="sound-bar"></span>
+                  <span class="sound-bar"></span>
+                </div>
+              </div>
+              <h2 id="card-title" class="font-display font-extrabold text-xl sm:text-2xl text-amber-300 mt-1 leading-tight">
+                Amígdala
+              </h2>
+            </div>
+          </div>
+
+          <!-- Botones de acción en la tarjeta: Escuchar de nuevo y Cerrar -->
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button onclick="speakCurrentPart()" title="Escuchar descripción"
+                    class="p-2 rounded-full bg-sky-600/80 hover:bg-sky-500 text-white border border-sky-300/60 transition cursor-pointer shadow">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+              </svg>
+            </button>
+            <button onclick="resetView()" title="Cerrar tarjeta"
+                    class="p-2 rounded-full bg-slate-800/80 hover:bg-rose-600/80 text-slate-200 hover:text-white border border-slate-600 transition cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Descripción Exacta -->
+        <p id="card-description" class="text-white/95 text-sm sm:text-base leading-relaxed mt-3 font-normal">
+          Interviene en el procesamiento de emociones, especialmente señales de amenaza y miedo.
+        </p>
+
+        <!-- Pie de tarjeta con ubicación funcional -->
+        <div class="mt-3 pt-2.5 border-t border-sky-400/20 flex items-center justify-between text-xs text-sky-200/85">
+          <span id="card-location">Ubicación: Lóbulo temporal medial</span>
+          <span id="card-counter" class="font-semibold text-amber-300">7 / 11</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- COLUMNA DERECHA (6 Botones) -->
+    <section aria-label="Estructuras derechas" class="lg:col-span-3 flex flex-row flex-wrap lg:flex-col justify-center gap-2.5 sm:gap-3.5 order-3">
+      <div id="right-buttons-container" class="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-2.5 sm:gap-3.5">
+        <!-- Generado dinámicamente por JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BARRA INFERIOR DE CONTROLES TIPO VIDEO INTERACTIVO -->
+  <footer class="relative z-20 w-full max-w-5xl mx-auto px-3 sm:px-6 pb-4 pt-1">
+    <div class="bg-slate-950/80 backdrop-blur-md border border-sky-400/40 rounded-2xl px-4 py-2.5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
+      
+      <!-- Controles de Reproducción -->
+      <div class="flex items-center gap-2">
+        <button onclick="prevPart()" title="Anterior"
+                class="p-2 rounded-xl bg-sky-900/70 hover:bg-sky-700 text-white border border-sky-500/40 transition cursor-pointer">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" />
+          </svg>
+        </button>
+
+        <button id="tour-toggle-btn" onclick="toggleTour()"
+                class="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-sky-500/30 flex items-center gap-2 transition cursor-pointer">
+          <svg id="tour-play-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+          </svg>
+          <span id="tour-btn-label">Reproducir Video Interactivo</span>
+        </button>
+
+        <button onclick="nextPart()" title="Siguiente"
+                class="p-2 rounded-xl bg-sky-900/70 hover:bg-sky-700 text-white border border-sky-500/40 transition cursor-pointer">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Barra de Progreso Interactiva de las 11 partes -->
+      <div class="flex-1 w-full flex flex-col gap-1">
+        <div class="flex justify-between text-[11px] text-sky-200/80 px-0.5">
+          <span id="progress-status">Explora libremente o inicia el recorrido guiado</span>
+          <span id="progress-step-text">0 / 11</span>
+        </div>
+        <div id="progress-dots" class="grid grid-cols-11 gap-1.5 w-full">
+          <!-- 11 segmentos generados por JS -->
+        </div>
+      </div>
+
+      <!-- Control de Audio (Silenciar / Activar Voz) -->
+      <div class="flex items-center gap-2">
+        <button id="audio-toggle-btn" onclick="toggleAudio()" title="Activar o silenciar narración por voz"
+                class="px-3 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-sky-200 border border-sky-500/40 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer">
+          <svg id="audio-on-icon" class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          </svg>
+          <svg id="audio-off-icon" class="hidden w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109
